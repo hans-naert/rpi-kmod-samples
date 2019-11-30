@@ -87,7 +87,7 @@ static int __init gpiomode_init(void)
 
 	printk(KERN_INFO "Successfully requested BUTTON1 IRQ # %d\n", button_irqs[0]);
 
-	ret = request_irq(button_irqs[0], button_isr, IRQF_TRIGGER_RISING | IRQF_DISABLED, "gpiomod#button1", NULL);
+	ret = request_irq(button_irqs[0], button_isr, IRQF_TRIGGER_RISING /*| IRQF_DISABLED*/, "gpiomod#button1", NULL);
 
 	if(ret) {
 		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
@@ -106,7 +106,7 @@ static int __init gpiomode_init(void)
 
 	printk(KERN_INFO "Successfully requested BUTTON2 IRQ # %d\n", button_irqs[1]);
 
-	ret = request_irq(button_irqs[1], button_isr, IRQF_TRIGGER_RISING | IRQF_DISABLED, "gpiomod#button2", NULL);
+	ret = request_irq(button_irqs[1], button_isr, IRQF_TRIGGER_RISING /*| IRQF_DISABLED*/, "gpiomod#button2", NULL);
 
 	if(ret) {
 		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
