@@ -25,18 +25,20 @@
 #define LED1	4
 
 static struct timer_list blink_timer;
+static long data=0;
 
 /*
  * Timer function called periodically
  */
-static void blink_timer_func(unsigned long data)
+static void blink_timer_func(struct timer_list* t)
 {
 	printk(KERN_INFO "%s\n", __func__);
 
-	gpio_set_value(LED1, data); 
+	gpio_set_value(LED1, data);
+	data=!data; 
 	
 	/* schedule next execution */
-	blink_timer.data = !data;						// makes the LED toggle 
+	//blink_timer.data = !data;						// makes the LED toggle 
 	blink_timer.expires = jiffies + (1*HZ); 		// 1 sec.
 	add_timer(&blink_timer);
 }
@@ -59,10 +61,11 @@ static int __init gpiomod_init(void)
 	}
 
 	/* init timer, add timer function */
-	init_timer(&blink_timer);
+	//init_timer(&blink_timer);
+	 timer_setup(&blink_timer, blink_timer_func, 0);
 
 	blink_timer.function = blink_timer_func;
-	blink_timer.data = 1L;							// initially turn LED on
+	//blink_timer.data = 1L;							// initially turn LED on
 	blink_timer.expires = jiffies + (1*HZ); 		// 1 sec.
 	add_timer(&blink_timer);
 
