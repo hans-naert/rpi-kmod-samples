@@ -1,2 +1,6 @@
 obj-m += gpiomod_inpirq.o 
-include $(PWD)/../../Makefile.kmod
+
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
