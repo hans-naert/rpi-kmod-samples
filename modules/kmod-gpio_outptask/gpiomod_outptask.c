@@ -20,6 +20,7 @@
 #include <linux/delay.h>
 #include <linux/interrupt.h>
 #include <linux/gpio.h>
+#include "query_ioctl.h"
 
 /* Define pins, directin and inital state of GPIOs for LEDs */
 static struct gpio leds[] = {
