@@ -137,8 +137,37 @@ DECLARE_TASKLET(tl_descr, blink_tasklet, 0L);
 static int __init gpiomod_init(void)
 {
 	int ret = 0;
-
+    struct device *dev_ret;
+	
 	printk(KERN_INFO "%s\n", __func__);
+
+    if ((ret = alloc_chrdev_region(&dev, FIRST_MINOR, MINOR_CNT, "query_ioctl_gpio2")) < 0)
+    {
+        return ret;
+    }
+ 
+    cdev_init(&c_dev, &query_fops);
+ 
+    if ((ret = cdev_add(&c_dev, dev, MINOR_CNT)) < 0)
+    {
+        return ret;
+    }
+     
+    if (IS_ERR(cl = class_create(THIS_MODULE, "char3")))
+    {
+        cdev_del(&c_dev);
+        unregister_chrdev_region(dev, MINOR_CNT);
+        return PTR_ERR(cl);
+    }
+    if (IS_ERR(dev_ret = device_create(cl, NULL, dev, NULL, "query_gpio2")))
+    {
+        class_destroy(cl);
+        cdev_del(&c_dev);
+        unregister_chrdev_region(dev, MINOR_CNT);
+        return PTR_ERR(dev_ret);
+    }
+ 
+
 
 	// register, turn on
 	ret = gpio_request_array(leds, ARRAY_SIZE(leds));
@@ -171,6 +200,11 @@ static void __exit gpiomod_exit(void)
 	
 	// unregister
 	gpio_free_array(leds, ARRAY_SIZE(leds));
+
+	device_destroy(cl, dev);
+    class_destroy(cl);
+    cdev_del(&c_dev);
+    unregister_chrdev_region(dev, MINOR_CNT);
 }
 
 MODULE_LICENSE("GPL");
