@@ -51,7 +51,7 @@ static void blink_tasklet(unsigned long data)
 	printk("Tasklet ended\n");	
 }
 
-DECLARE_TASKLET(tl_descr, blink_tasklet, 0L);
+DECLARE_TASKLET_OLD(tl_descr, blink_tasklet);
 
 /*
  * Module init function

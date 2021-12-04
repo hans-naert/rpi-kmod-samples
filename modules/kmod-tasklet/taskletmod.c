@@ -29,7 +29,7 @@ static void tasklet_func(unsigned long data)
 	printk("Tasklet ended\n");	
 }
 
-DECLARE_TASKLET(tl_descr, tasklet_func, 0L);
+DECLARE_TASKLET_OLD(tl_descr, tasklet_func);
 
 /*
  * Module init function
