@@ -34,16 +34,27 @@ static struct gpio leds[] = {
 static int __init gpiomod_init(void)
 {
 	int ret = 0;
+	int i;
 
 	printk(KERN_INFO "%s\n", __func__);
 
 	// register LED GPIOs, turn LEDs on
-	ret = gpio_request_array(leds, ARRAY_SIZE(leds));
-
-	if (ret) {
-		printk(KERN_ERR "Unable to request GPIOs: %d\n", ret);
+	for (i = 0; i < ARRAY_SIZE(leds); i++) {
+		ret = gpio_request(leds[i].gpio, leds[i].label);
+		if (ret) {
+			printk(KERN_ERR "Unable to request GPIO %d: %d\n", leds[i].gpio, ret);
+			goto err_free_gpios;
+		}
+		gpio_direction_output(leds[i].gpio, (leds[i].flags & GPIOF_OUT_INIT_HIGH) ? 1 : 0);
 	}
 
+	return 0;
+
+err_free_gpios:
+	// Free any GPIOs that were successfully requested
+	while (--i >= 0) {
+		gpio_free(leds[i].gpio);
+	}
 	return ret;
 }
 
@@ -62,7 +73,9 @@ static void __exit gpiomod_exit(void)
 	}
 	
 	// unregister all GPIOs
-	gpio_free_array(leds, ARRAY_SIZE(leds));
+	for(i = 0; i < ARRAY_SIZE(leds); i++) {
+		gpio_free(leds[i].gpio);
+	}
 }
 
 MODULE_LICENSE("GPL");

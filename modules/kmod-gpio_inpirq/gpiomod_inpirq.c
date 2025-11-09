@@ -55,23 +55,28 @@ static irqreturn_t button_isr(int irq, void *data)
 static int __init gpiomode_init(void)
 {
 	int ret = 0;
+	int i;
 
 	printk(KERN_INFO "%s\n", __func__);
 
 	// register LED gpios
-	ret = gpio_request_array(leds, ARRAY_SIZE(leds));
-
-	if (ret) {
-		printk(KERN_ERR "Unable to request GPIOs for LEDs: %d\n", ret);
-		return ret;
+	for (i = 0; i < ARRAY_SIZE(leds); i++) {
+		ret = gpio_request(leds[i].gpio, leds[i].label);
+		if (ret) {
+			printk(KERN_ERR "Unable to request GPIO %d: %d\n", leds[i].gpio, ret);
+			goto err_free_leds;
+		}
+		gpio_direction_output(leds[i].gpio, (leds[i].flags & GPIOF_OUT_INIT_LOW) ? 0 : 1);
 	}
 	
 	// register BUTTON gpios
-	ret = gpio_request_array(buttons, ARRAY_SIZE(buttons));
-
-	if (ret) {
-		printk(KERN_ERR "Unable to request GPIOs for BUTTONs: %d\n", ret);
-		goto fail1;
+	for (i = 0; i < ARRAY_SIZE(buttons); i++) {
+		ret = gpio_request(buttons[i].gpio, buttons[i].label);
+		if (ret) {
+			printk(KERN_ERR "Unable to request GPIO %d: %d\n", buttons[i].gpio, ret);
+			goto err_free_buttons;
+		}
+		gpio_direction_input(buttons[i].gpio);
 	}
 
 	printk(KERN_INFO "Current button1 value: %d\n", gpio_get_value(buttons[0].gpio));
@@ -80,7 +85,7 @@ static int __init gpiomode_init(void)
 
 	if(ret < 0) {
 		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
-		goto fail2;
+		goto err_free_buttons;
 	}
 
 	button_irqs[0] = ret;
@@ -91,7 +96,7 @@ static int __init gpiomode_init(void)
 
 	if(ret) {
 		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
-		goto fail2;
+		goto err_free_buttons;
 	}
 
 
@@ -99,7 +104,7 @@ static int __init gpiomode_init(void)
 
 	if(ret < 0) {
 		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
-		goto fail2;
+		goto err_free_buttons;
 	}
 		
 	button_irqs[1] = ret;
@@ -119,11 +124,18 @@ static int __init gpiomode_init(void)
 fail3:
 	free_irq(button_irqs[0], NULL);
 
-fail2: 
-	gpio_free_array(buttons, ARRAY_SIZE(leds));
+err_free_buttons:
+	// Free any button GPIOs that were successfully requested
+	while (--i >= 0) {
+		gpio_free(buttons[i].gpio);
+	}
+	i = ARRAY_SIZE(leds);
 
-fail1:
-	gpio_free_array(leds, ARRAY_SIZE(leds));
+err_free_leds:
+	// Free any LED GPIOs that were successfully requested
+	while (--i >= 0) {
+		gpio_free(leds[i].gpio);
+	}
 
 	return ret;	
 }
@@ -146,9 +158,13 @@ static void __exit gpiomode_exit(void)
 		gpio_set_value(leds[i].gpio, 0); 
 	}
 	
-	// unregister
-	gpio_free_array(leds, ARRAY_SIZE(leds));
-	gpio_free_array(buttons, ARRAY_SIZE(buttons));
+	// unregister GPIOs
+	for(i = 0; i < ARRAY_SIZE(leds); i++) {
+		gpio_free(leds[i].gpio);
+	}
+	for(i = 0; i < ARRAY_SIZE(buttons); i++) {
+		gpio_free(buttons[i].gpio);
+	}
 }
 
 MODULE_LICENSE("GPL");

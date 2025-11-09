@@ -1,3 +1,10 @@
+*.cmd
+*.ko
+*.mod
+*.mod.c
+*.symvers
+*.order
+
 # Object files
 *.o
 
