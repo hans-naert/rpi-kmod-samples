@@ -23,9 +23,9 @@
 
 /* Define pins, directin and inital state of GPIOs for LEDs */
 static struct gpio leds[] = {
-		{  4, GPIOF_OUT_INIT_LOW, "LED 1" },
-		{ 25, GPIOF_OUT_INIT_LOW, "LED 2" },
-		{ 24, GPIOF_OUT_INIT_LOW, "LED 3" },
+		{  4 + 512, GPIOF_OUT_INIT_LOW, "LED 1" },
+		{ 25 + 512, GPIOF_OUT_INIT_LOW, "LED 2" },
+		{ 24 + 512, GPIOF_OUT_INIT_LOW, "LED 3" },
 };
 
 /* Tasklet to blink the LEDs */

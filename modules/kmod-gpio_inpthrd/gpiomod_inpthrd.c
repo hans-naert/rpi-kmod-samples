@@ -24,14 +24,14 @@
 
 /* Define LEDs */
 static struct gpio leds[] = {
-		{  4, GPIOF_OUT_INIT_LOW, "LED 1" },
-		{ 25, GPIOF_OUT_INIT_LOW, "LED 2" },
+		{  4 + 512, GPIOF_OUT_INIT_LOW, "LED 1" },
+		{ 25 + 512, GPIOF_OUT_INIT_LOW, "LED 2" },
 };
 
 /* Define BUTTONs */
 static struct gpio buttons[] = {
-		{ 17, GPIOF_IN, "BUTTON 1" },	// Blink LED 1 faster
-		{ 18, GPIOF_IN, "BUTTON 2" },	// Blink LED 1 slower
+		{ 17 + 512, GPIOF_IN, "BUTTON 1" },	// Blink LED 1 faster
+		{ 18 + 512, GPIOF_IN, "BUTTON 2" },	// Blink LED 1 slower
 };
 
 /* IRQs assigned to BUTTONs */

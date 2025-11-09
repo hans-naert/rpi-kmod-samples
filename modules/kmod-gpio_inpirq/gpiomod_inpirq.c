@@ -22,13 +22,13 @@
 
 /* Define GPIOs for LEDs */
 static struct gpio leds[] = {
-		{  4, GPIOF_OUT_INIT_LOW, "LED 1" },
+		{  4 + 512, GPIOF_OUT_INIT_LOW, "LED 1" },
 };
 
 /* Define GPIOs for BUTTONS */
 static struct gpio buttons[] = {
-		{ 17, GPIOF_IN, "BUTTON 1" },	// turns LED on
-		{ 18, GPIOF_IN, "BUTTON 2" },	// turns LED off
+		{ 17 + 512, GPIOF_IN, "BUTTON 1" },	// turns LED on
+		{ 18 + 512, GPIOF_IN, "BUTTON 2" },	// turns LED off
 };
 
 /* Later on, the assigned IRQ numbers for the buttons are stored here */

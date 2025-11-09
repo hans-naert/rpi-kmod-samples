@@ -22,7 +22,7 @@
 #include <linux/init.h>
 #include <linux/gpio.h>
 
-#define LED1	4
+#define LED1	4 + 512
 
 static struct timer_list blink_timer;
 static long data=0;
