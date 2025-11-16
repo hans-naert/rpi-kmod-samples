@@ -38,7 +38,7 @@ static struct gpio buttons[] = {
 static int button_irqs[] = { -1, -1 };
 
 /* Initial blink delay */
-static int blink_delay = 100;
+static int blink_delay = 1000;
 
 /* Task handle to identify thread */ 
 static struct task_struct *ts = NULL;
@@ -66,24 +66,16 @@ static int led_thread(void *data)
  */
 static irqreturn_t button_isr(int irq, void *data)
 {
-	int max_delay = 10;
-
 	// indicate button press
 	gpio_set_value(leds[0].gpio, 1);
 
 	if(irq == button_irqs[0]) {
 			// make LED blink faster
-			blink_delay+= 10;
-			if(blink_delay >= 1500) blink_delay = 100;		
-			// wait for BUTTON releas, but no more then 5 x mdelay(5)
-			while(gpio_get_value(buttons[0].gpio) && max_delay--) mdelay(5);
+			blink_delay = 500;
 	}
 	else if(irq == button_irqs[1]) {
 			// make LED blink slower
-			blink_delay-= 10;
-			if(blink_delay <= 100) blink_delay = 1500;		
-			// wait for BUTTON releas, but no more then 5 x mdelay(5)
-			while(gpio_get_value(buttons[1].gpio) && max_delay--) mdelay(5);
+			blink_delay = 1500;
 	}
 
 	printk("Delay: %d\n", blink_delay);
